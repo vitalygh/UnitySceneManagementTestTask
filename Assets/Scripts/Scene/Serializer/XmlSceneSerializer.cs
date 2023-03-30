@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -14,13 +15,13 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
     {
         if (!File.Exists(path))
         {
-            log?.Error("File not found: " + path);
+            log.Error("File not found: " + path);
             return;
         }
         if (sceneController == null)
-            log?.Error("ISceneController not found");
+            log.Error("ISceneController not found");
         if (inputSettings == null)
-            log?.Error("IInputSettings not found");
+            log.Error("IInputSettings not found");
         SerializedScene serializedScene = null;
         try
         {
@@ -30,9 +31,9 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
                 serializedScene = serializer.Deserialize(stream) as SerializedScene;
             }
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
-            log?.Error("Scene loading failed: " + e);
+            log.Error("Scene loading failed: " + e);
         }
         if (serializedScene == null)
             return;
@@ -44,13 +45,31 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
         sceneController?.ClearScene();
         foreach (var obj in serializedScene.objects)
         {
-            if (!System.Enum.TryParse(typeof(SceneObjectType), obj.type, out object value))
+            if (obj == null)
             {
-                log?.Error("Type deserialization failed: " + obj.type);
+                log.Error("Null object deserialized");
+                continue;
+            }
+            if (!Enum.TryParse(typeof(SceneObjectType), obj.type, out object value))
+            {
+                log.Error("Type deserialization failed: " + obj.type);
                 continue;
             }
             var newObject = sceneController?.CreateObject((SceneObjectType)value, obj.position);
-            obj.Deserialize(newObject);
+            if (newObject == null)
+            {
+                log.Error("Creating object of type failed: " + obj.type);
+                continue;
+            }
+            try
+            {
+                obj.Deserialize(newObject);
+            }
+            catch (Exception e)
+            {
+                log.Error("Object deserialization failed: " + e);
+                continue;
+            }
         }
     }
 
@@ -58,12 +77,12 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
     {
         if (sceneController == null)
         {
-            log?.Error("ISceneController not found");
+            log.Error("ISceneController not found");
             return;
         }
         if (inputSettings == null)
         {
-            log?.Error("IInputSettings not found");
+            log.Error("IInputSettings not found");
             return;
         }
         var serializedScene = new SerializedScene();
@@ -72,14 +91,15 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
         serializedScene.objects = new List<SerializedSceneObject>();
         foreach (var obj in sceneController.Objects)
         {
-            SerializedSceneObject serializedObject;
-            if (obj is CubeObject cubeObject)
-                serializedObject = new SerializedSceneCube(cubeObject);
-            else if (obj is SphereObject sphereObject)
-                serializedObject = new SerializedSceneSphere(sphereObject);
-            else
+            if (obj == null)
             {
-                log?.Error("Unknown object type: " + obj.GetType());
+                log.Error("Null object serialized");
+                continue;
+            }
+            var serializedObject = obj.Serialize(this);
+            if (serializedObject == null)
+            {
+                log.Error("Serialized object is null: " + obj.ObjectType);
                 continue;
             }
             serializedScene.objects.Add(serializedObject);
@@ -106,10 +126,20 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
 
             log?.Notify("Saved: " + path);
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
-            log?.Error("Scene saving failed: " + e);
+            log.Error("Scene saving failed: " + e);
         }
+    }
+
+    SerializedSceneObject ISceneSerializer.Serialize(CubeObject cubeObject)
+    {
+        return new SerializedSceneCube(cubeObject);
+    }
+
+    SerializedSceneObject ISceneSerializer.Serialize(SphereObject sphereObject)
+    {
+        return new SerializedSceneSphere(sphereObject);
     }
 
     // Start is called before the first frame update
@@ -117,6 +147,10 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
     {
         log = GetComponent<ILog>();
         sceneController = GetComponent<ISceneController>();
+        if (sceneController == null)
+            log.Error("ISceneController not found");
         inputSettings = GetComponent<IInputSettings>();
+        if (inputSettings == null)
+            log.Error("IInputSettings not found");
     }
 }

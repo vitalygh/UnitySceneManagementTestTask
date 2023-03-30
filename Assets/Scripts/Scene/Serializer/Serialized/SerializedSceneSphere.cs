@@ -13,7 +13,6 @@ public class SerializedSceneSphere : SerializedSceneObject
 
     public override void Deserialize(ISceneObject obj)
     {
-        if (obj is SphereObject sphereObject)
-            sphereObject.uniqueSphereData = uniqueSphereData;
+        ((SphereObject)obj).uniqueSphereData = uniqueSphereData;
     }
 }

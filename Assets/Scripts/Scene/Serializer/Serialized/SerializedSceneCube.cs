@@ -13,7 +13,6 @@ public class SerializedSceneCube : SerializedSceneObject
 
     public override void Deserialize(ISceneObject obj)
     {
-        if (obj is CubeObject cubeObject)
-            cubeObject.uniqueCubeData = uniqueCubeData;
+        ((CubeObject)obj).uniqueCubeData = uniqueCubeData;
     }
 }

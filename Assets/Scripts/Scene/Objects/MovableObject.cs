@@ -15,4 +15,6 @@ public abstract class MovableObject : MonoBehaviour, ISceneObject
             transform.position = new Vector3(value.x, 0.0f, value.y);
         }
     }
+
+    public abstract SerializedSceneObject Serialize(ISceneSerializer serializer);
 }

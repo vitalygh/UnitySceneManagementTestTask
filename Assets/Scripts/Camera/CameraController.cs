@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour, ICameraController
 
     public void Yaw(float delta)
     {
-        angle.y += delta;
+        angle.y = (angle.y + delta) % 360.0f;
         transform.rotation = Quaternion.Euler(angle);
     }
 

@@ -124,8 +124,6 @@ public class SceneController : MonoBehaviour, ISceneController
         if (cameraController == null)
             return;
         var rotateDelta = CameraRotateSpeed * delta * Time.deltaTime;
-        if (inputSettings != null)
-            rotateDelta *= inputSettings.MouseSensitivityMultiplier;
         cameraController.Pitch(-rotateDelta.y);
         cameraController.Yaw(rotateDelta.x);
     }
@@ -215,7 +213,7 @@ public class SceneController : MonoBehaviour, ISceneController
         if ((inputControllers == null) || (inputControllers.Length <= 0))
             log.Error("IInputController not found");
         inputSettings = GetComponent<IInputSettings>();
-        if (inputControllers == null)
+        if (inputSettings == null)
             log.Error("IInputSettings not found");
         cameraController = mainCamera?.GetComponent<ICameraController>();
         if (cameraController == null)

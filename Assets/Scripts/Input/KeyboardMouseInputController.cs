@@ -4,6 +4,8 @@ using UnityEngine.Events;
 
 public class KeyboardMouseInputController : MonoBehaviour, IInputController
 {
+    private ILog log = null;
+    private IInputSettings inputSettings = null;
     private Vector3 rotateStartCursorPosition = Vector3.zero;
     private bool objectMoveStarted = false;
     private readonly Dictionary<KeyCode, CameraMoveDirection> moveKeys = new Dictionary<KeyCode, CameraMoveDirection>
@@ -47,7 +49,10 @@ public class KeyboardMouseInputController : MonoBehaviour, IInputController
     // Start is called before the first frame update
     void Start()
     {
-        
+        log = GetComponent<ILog>();
+        inputSettings = GetComponent<IInputSettings>();
+        if (inputSettings == null)
+            log.Error("IInputSettings not found");
     }
 
     // Update is called once per frame
@@ -72,6 +77,8 @@ public class KeyboardMouseInputController : MonoBehaviour, IInputController
         if (Input.GetMouseButton(1))
         {
             var delta = CursorPosition - rotateStartCursorPosition;
+            if (inputSettings != null)
+                delta *= inputSettings.MouseSensitivityMultiplier;
             if (delta.magnitude > Mathf.Epsilon)
             {
                 rotateStartCursorPosition = CursorPosition;

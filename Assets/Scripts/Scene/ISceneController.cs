@@ -3,11 +3,12 @@ using UnityEngine;
 
 public interface ISceneController
 {
-    ISceneObject CreateObject(SceneObjectType objectType, Vector2 position);
+    ISceneObject CreateObject(string objectType, Vector2 position);
     void DestroyObject(ISceneObject sceneObject);
+    IEnumerable<string> ObjectTypes { get; }
     IEnumerable<ISceneObject> Objects { get; }
 
-    SceneObjectType CurrentType { get; set; }
+    string CurrentType { get; set; }
     void ClearScene();
     void SaveScene();
     void LoadScene();

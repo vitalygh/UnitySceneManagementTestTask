@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class MovableObject : MonoBehaviour, ISceneObject
 {
-    public abstract SceneObjectType ObjectType { get; }
+    public virtual string ObjectType => GetType().Name;
     public Vector2 Position
     {
         get

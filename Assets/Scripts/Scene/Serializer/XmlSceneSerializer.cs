@@ -50,12 +50,7 @@ public class XmlSceneSerializer : MonoBehaviour, ISceneSerializer
                 log.Error("Null object deserialized");
                 continue;
             }
-            if (!Enum.TryParse(typeof(SceneObjectType), obj.type, out object value))
-            {
-                log.Error("Type deserialization failed: " + obj.type);
-                continue;
-            }
-            var newObject = sceneController?.CreateObject((SceneObjectType)value, obj.position);
+            var newObject = sceneController?.CreateObject(obj.type, obj.position);
             if (newObject == null)
             {
                 log.Error("Creating object of type failed: " + obj.type);

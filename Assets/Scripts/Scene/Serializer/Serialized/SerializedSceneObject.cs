@@ -13,7 +13,7 @@ public class SerializedSceneObject
 
     public SerializedSceneObject(ISceneObject obj)
     {
-        type = obj.ObjectType.ToString();
+        type = obj.ObjectType;
         position = obj.Position;
     }
     public virtual void Deserialize(ISceneObject obj)

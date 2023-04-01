@@ -25,10 +25,10 @@ public class SceneController : MonoBehaviour, ISceneController
     private readonly string sceneObjectsLayerName = "Scene Objects";
     private MovableObject selectedObject = null;
 
-    private Dictionary<SceneObjectType, GameObject> prototypes = new Dictionary<SceneObjectType, GameObject>();
+    private Dictionary<string, GameObject> prototypes = new Dictionary<string, GameObject>();
     private Dictionary<ISceneObject, GameObject> createdObjects = new Dictionary<ISceneObject, GameObject>();
 
-    public ISceneObject CreateObject(SceneObjectType objectType, Vector2 position)
+    public ISceneObject CreateObject(string objectType, Vector2 position)
     {
         if (!prototypes.ContainsKey(objectType))
         {
@@ -66,6 +66,14 @@ public class SceneController : MonoBehaviour, ISceneController
         Destroy(obj);
     }
 
+    public IEnumerable<string> ObjectTypes
+    {
+        get
+        {
+            return prototypes.Keys;
+        }
+    }
+
     public IEnumerable<ISceneObject> Objects
     {
         get
@@ -74,7 +82,7 @@ public class SceneController : MonoBehaviour, ISceneController
         }
     }
 
-    public SceneObjectType CurrentType { get; set; }
+    public string CurrentType { get; set; }
 
     public void ClearScene()
     {

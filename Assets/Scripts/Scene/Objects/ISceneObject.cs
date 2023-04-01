@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface ISceneObject
 {
-    SceneObjectType ObjectType { get; }
+    string ObjectType { get; }
     Vector2 Position { get; }
     SerializedSceneObject Serialize(ISceneSerializer serializer);
 }

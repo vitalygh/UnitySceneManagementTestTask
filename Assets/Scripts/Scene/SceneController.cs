@@ -30,6 +30,11 @@ public class SceneController : MonoBehaviour, ISceneController
 
     public ISceneObject CreateObject(string objectType, Vector2 position)
     {
+        if (objectType == null)
+        {
+            log.Error("objectType is null");
+            return null;
+        }
         if (!prototypes.ContainsKey(objectType))
         {
             log.Error("No prototype for type: " + objectType);
@@ -57,6 +62,11 @@ public class SceneController : MonoBehaviour, ISceneController
 
     public void DestroyObject(ISceneObject sceneObject)
     {
+        if (sceneObject == null)
+        {
+            log.Warning("sceneObject is null");
+            return;
+        }
         if (!createdObjects.TryGetValue(sceneObject, out GameObject obj))
         {
             log.Warning("Object not found!");

@@ -29,8 +29,14 @@ public class SceneUI : MonoBehaviour
             {
                 var objectTypes = new List<string>(sceneController.ObjectTypes);
                 objectTypeDropDown.ClearOptions();
-                objectTypeDropDown.AddOptions(objectTypes);
-                objectTypeDropDown.onValueChanged.AddListener((index) => sceneController.CurrentType = objectTypes[index]);
+                if (objectTypes.Count < 0)
+                    log.Error("Object types list is empty");
+                else
+                {
+                    objectTypeDropDown.AddOptions(objectTypes);
+                    objectTypeDropDown.onValueChanged.AddListener((index) => sceneController.CurrentType = objectTypes[index]);
+                    sceneController.CurrentType = objectTypes[objectTypeDropDown.value];
+                }
             }
 
             if (clearSceneButton == null)

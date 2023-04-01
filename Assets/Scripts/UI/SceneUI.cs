@@ -9,6 +9,7 @@ public class SceneUI : MonoBehaviour
     public Button clearSceneButton = null;
     public Button saveSceneButton = null;
     public Button loadSceneButton = null;
+    public GameObject screenCenter = null;
   
     public GameObject sceneControllerHolder = null;
     private ISceneController sceneController = null;

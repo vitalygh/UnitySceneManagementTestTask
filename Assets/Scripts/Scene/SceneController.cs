@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(IInputController))]
 [RequireComponent(typeof(IInputSettings))]
@@ -16,6 +17,7 @@ public class SceneController : MonoBehaviour, ISceneController
     public GameObject[] prefabs = null;
 
     private IInputController[] inputControllers = null;
+    private IExtendedInputController[] extendedInputControllers = null;
     private ICameraController cameraController = null;
     private IInputSettings inputSettings = null;
     private ILog log = null;
@@ -92,7 +94,22 @@ public class SceneController : MonoBehaviour, ISceneController
         }
     }
 
-    public string CurrentType { get; set; }
+    private string currentType = null;
+    public string CurrentType
+    {
+        get
+        {
+            return currentType;
+        }
+        set
+        {
+            if (currentType != value)
+                OnCurrentTypeChanged?.Invoke(value);
+            currentType = value;
+        }
+    }
+
+    public UnityAction<string> OnCurrentTypeChanged { get; set; }
 
     public void ClearScene()
     {
@@ -109,6 +126,27 @@ public class SceneController : MonoBehaviour, ISceneController
     public void LoadScene()
     {
         sceneSerializer?.Load(SceneSerializationPath);
+    }
+
+    public void SetNextCurrentType()
+    {
+        string first = null;
+        string prev = null;
+        string next = null;
+        foreach (var type in ObjectTypes)
+        {
+            if (first == null)
+                first = type;
+            if (prev == CurrentType)
+            {
+                next = type;
+                break;
+            }
+            prev = type;
+        }
+        if (next == null)
+            next = first;
+        CurrentType = next;
     }
 
     private void OnCameraMove(CameraMoveDirection cameraMoveDirection)
@@ -230,6 +268,7 @@ public class SceneController : MonoBehaviour, ISceneController
         inputControllers = GetComponents<IInputController>();
         if ((inputControllers == null) || (inputControllers.Length <= 0))
             log.Error("IInputController not found");
+        extendedInputControllers = GetComponents<IExtendedInputController>();
         inputSettings = GetComponent<IInputSettings>();
         if (inputSettings == null)
             log.Error("IInputSettings not found");
@@ -251,6 +290,14 @@ public class SceneController : MonoBehaviour, ISceneController
             inputController.OnObjectMoveKeyUp += OnObjectMoveKeyUp;
         }
 
+        foreach (var extendedInputController in extendedInputControllers)
+        {
+            extendedInputController.OnClearSceneButtonClick += ClearScene;
+            extendedInputController.OnLoadSceneButtonClick += LoadScene;
+            extendedInputController.OnSaveSceneButtonClick += SaveScene;
+            extendedInputController.OnNextObjectTypeButtonClick += SetNextCurrentType;
+        }
+
         InitPrototypes();
     }
 
@@ -266,5 +313,14 @@ public class SceneController : MonoBehaviour, ISceneController
             inputController.OnObjectMove -= OnObjectMove;
             inputController.OnObjectMoveKeyUp -= OnObjectMoveKeyUp;
         }
+
+        foreach (var extendedInputController in extendedInputControllers)
+        {
+            extendedInputController.OnClearSceneButtonClick -= ClearScene;
+            extendedInputController.OnLoadSceneButtonClick -= LoadScene;
+            extendedInputController.OnSaveSceneButtonClick -= SaveScene;
+            extendedInputController.OnNextObjectTypeButtonClick -= SetNextCurrentType;
+        }
+
     }
 }

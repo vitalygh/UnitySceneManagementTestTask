@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public interface ISceneController
 {
@@ -9,6 +10,8 @@ public interface ISceneController
     IEnumerable<ISceneObject> Objects { get; }
 
     string CurrentType { get; set; }
+    UnityAction<string> OnCurrentTypeChanged { get; set; }
+
     void ClearScene();
     void SaveScene();
     void LoadScene();

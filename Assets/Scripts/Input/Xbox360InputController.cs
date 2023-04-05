@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Xbox360InputController : MonoBehaviour, IInputController
+public class Xbox360InputController : MonoBehaviour, IInputController, IExtendedInputController
 {
     private ILog log = null;
     private IInputSettings inputSettings = null;
@@ -26,6 +26,10 @@ public class Xbox360InputController : MonoBehaviour, IInputController
     private readonly string JoyA = "JoyA";
     private readonly string JoyB = "JoyB";
     private readonly string JoyX = "JoyX";
+    private readonly string JoyY = "JoyY";
+    private readonly string JoyLB = "JoyLB";
+    private readonly string JoyRB = "JoyRB";
+    private readonly string JoyBack = "JoyBack";
 
     private Vector3 cursorPosition = Vector3.zero;
     public Vector3 CursorPosition => cursorPosition;
@@ -68,6 +72,11 @@ public class Xbox360InputController : MonoBehaviour, IInputController
     public UnityAction<Vector3> OnObjectMoveKeyDown { get; set; }
     public UnityAction<Vector3> OnObjectMove { get; set; }
     public UnityAction<Vector3> OnObjectMoveKeyUp { get; set; }
+
+    public UnityAction OnNextObjectTypeButtonClick { get; set; }
+    public UnityAction OnClearSceneButtonClick { get; set; }
+    public UnityAction OnSaveSceneButtonClick { get; set; }
+    public UnityAction OnLoadSceneButtonClick { get; set; }
 
     // Start is called before the first frame update
     void Start()
@@ -156,5 +165,14 @@ public class Xbox360InputController : MonoBehaviour, IInputController
                 objectMoveStarted = false;
             }
         }
+
+        if (Input.GetButtonDown(JoyY))
+            OnNextObjectTypeButtonClick?.Invoke();
+        if (Input.GetButtonDown(JoyLB))
+            OnSaveSceneButtonClick?.Invoke();
+        if (Input.GetButtonDown(JoyRB))
+            OnLoadSceneButtonClick?.Invoke();
+        if (Input.GetButtonDown(JoyBack))
+            OnClearSceneButtonClick?.Invoke();
     }
 }

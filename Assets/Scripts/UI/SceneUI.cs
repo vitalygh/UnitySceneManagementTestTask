@@ -15,6 +15,16 @@ public class SceneUI : MonoBehaviour
     private ISceneController sceneController = null;
     private ILog log = null;
 
+    private void OnCurrentTypeChanged(string type)
+    {
+        if (objectTypeDropDown == null)
+            return;
+        var objectTypes = new List<string>(sceneController.ObjectTypes);
+        for (var i = 0; i < objectTypes.Count; i++)
+            if (objectTypes[i] == type)
+                objectTypeDropDown.value = i;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,6 +48,7 @@ public class SceneUI : MonoBehaviour
                     objectTypeDropDown.onValueChanged.AddListener((index) => sceneController.CurrentType = objectTypes[index]);
                     sceneController.CurrentType = objectTypes[objectTypeDropDown.value];
                 }
+                sceneController.OnCurrentTypeChanged += OnCurrentTypeChanged;
             }
 
             if (clearSceneButton == null)
@@ -55,5 +66,11 @@ public class SceneUI : MonoBehaviour
             else
                 loadSceneButton.onClick.AddListener(sceneController.LoadScene);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (sceneController != null)
+            sceneController.OnCurrentTypeChanged -= OnCurrentTypeChanged;
     }
 }
